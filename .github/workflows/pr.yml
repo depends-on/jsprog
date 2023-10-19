@@ -1,0 +1,43 @@
+---
+
+name: Build and test a PR
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    name: Build and test
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract dependent PR
+        uses: depends-on/depends-on-action@js
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run build and test
+        run: |
+          set -x
+          npm install
+          ls -l node_modules/*/
+          node prog.js
+
+  check-all-dependencies-are-merged:
+    runs-on: ubuntu-latest
+    name: Check all dependent PR are merged
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract dependent PR
+        uses: depends-on/depends-on-action@js
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          check-unmerged-pr: true
+
+...
